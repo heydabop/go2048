@@ -76,8 +76,10 @@ func findMove(board [4][4]uint16) string {
 			}
 			if lastSeen == board[i][j] {
 				rowMatches++
+				lastSeen = 0
+			} else {
+				lastSeen = board[i][j]
 			}
-			lastSeen = board[i][j]
 		}
 	}
 
@@ -94,8 +96,10 @@ func findMove(board [4][4]uint16) string {
 			}
 			if lastSeen == board[j][i] {
 				colMatches++
+				lastSeen = 0
+			} else {
+				lastSeen = board[j][i]
 			}
-			lastSeen = board[j][i]
 		}
 	}
 
