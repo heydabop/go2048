@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"log"
+	"math"
 
 	"github.com/BurntSushi/xgb/xproto"
 
@@ -60,7 +61,49 @@ func colorNum(c color.Color) uint16 {
 	return 0
 }
 
-func findMove(board [4][4]uint16) string {
+func exploreMoves(board [4][4]uint16, depth int) (string, int) {
+	if depth == 0 {
+		//return calcMatches(board)
+		score := 0
+		for i := 0; i < 4; i++ {
+			for j := 0; j < 4; j++ {
+				if board[i][j] != 0{
+					score += int((math.Log2(float64(board[i][j])) - 2))
+				}
+			}
+		}
+		return "", score
+	}
+	_, up := exploreMoves(simMove(board, "U"), depth-1)
+	_, down := exploreMoves(simMove(board, "D"), depth-1)
+	_, left := exploreMoves(simMove(board, "L"), depth-1)
+	_, right := exploreMoves(simMove(board, "R"), depth-1)
+	fmt.Println("Moves:", up, down, left, right)
+	if up >= down {
+		if up >= left {
+			if up >= right {
+				return "U", up
+			}
+			return "R", right
+		}
+		if left >= right {
+			return "L", left
+		}
+		return "R", right
+	}
+	if down >= left {
+		if down >= right {
+			return "D", down
+		}
+		return "R", right
+	}
+	if left >= right {
+		return "L", left
+	}
+	return "R", right
+}
+
+func calcMatches(board [4][4]uint16) (string, int) {
 	rowMatches, colMatches := 0, 0
 
 	//find matches made by a move row-wise (left or right)
@@ -103,12 +146,18 @@ func findMove(board [4][4]uint16) string {
 		}
 	}
 
-	fmt.Println(rowMatches)
-	fmt.Println(colMatches)
+	//fmt.Println(rowMatches)
+	//fmt.Println(colMatches)
 	if rowMatches > colMatches {
-		return "L"
+		return "L", rowMatches
 	}
-	return "U"
+	return "U", colMatches
+}
+
+func findMove(board [4][4]uint16) string {
+	move, _ := exploreMoves(board, 3)
+	//fmt.Println(calcMatches(board))
+	return move
 }
 
 func simMove(board [4][4]uint16, move string) [4][4]uint16 {
