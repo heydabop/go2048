@@ -132,18 +132,13 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 				free++
 			}
 			//merge tiles
-			match := true
-			for p := 0; p < 2 && match; p++ { //if tiles were merged, make two passes
-				match = false
-				for j := 0; j < 3; j++ {
-					if board[j][i] == board[j+1][i] { //marge matching tiles
-						match = true
-						board[j][i] *= 2
-						for k := j+1; k < 3; k++{ //shift following tiles
-							board[k][i] = board[k+1][i]
-						}
-						board[3][i] = 0
+			for j := 0; j < 3; j++ {
+				if board[j][i] == board[j+1][i] { //marge matching tiles
+					board[j][i] *= 2
+					for k := j+1; k < 3; k++{ //shift following tiles
+						board[k][i] = board[k+1][i]
 					}
+					board[3][i] = 0
 				}
 			}
 		}
@@ -166,18 +161,13 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 				free--
 			}
 			//merge tiles
-			match := true
-			for p := 0; p < 2 && match; p++ { //if tiles were merged, make two passes
-				match = false
-				for j := 3; j >= 1; j-- {
-					if board[j][i] == board[j-1][i] { //marge matching tiles
-						match = true
-						board[j][i] *= 2
-						for k := j-1; k >= 1; k--{ //shift following tiles
-							board[k][i] = board[k-1][i]
-						}
-						board[0][i] = 0
+			for j := 3; j >= 1; j-- {
+				if board[j][i] == board[j-1][i] { //marge matching tiles
+					board[j][i] *= 2
+					for k := j-1; k >= 1; k--{ //shift following tiles
+						board[k][i] = board[k-1][i]
 					}
+					board[0][i] = 0
 				}
 			}
 		}
@@ -200,18 +190,13 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 				free++
 			}
 			//merge tiles
-			match := true
-			for p := 0; p < 2 && match; p++ { //if tiles were merged, make two passes
-				match = false
-				for j := 0; j < 3; j++ {
-					if board[i][j] == board[i][j+1] { //marge matching tiles
-						match = true
-						board[i][j] *= 2
-						for k := j+1; k < 3; k++{ //shift following tiles
-							board[i][k] = board[i][k+1]
-						}
-						board[i][3] = 0
+			for j := 0; j < 3; j++ {
+				if board[i][j] == board[i][j+1] { //marge matching tiles
+					board[i][j] *= 2
+					for k := j+1; k < 3; k++{ //shift following tiles
+						board[i][k] = board[i][k+1]
 					}
+					board[i][3] = 0
 				}
 			}
 		}
@@ -234,18 +219,13 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 				free--
 			}
 			//merge tiles
-			match := true
-			for p := 0; p < 2 && match; p++ { //if tiles were merged, make two passes
-				match = false
-				for j := 3; j >= 1; j-- {
-					if board[i][j] == board[i][j-1] { //marge matching tiles
-						match = true
-						board[i][j] *= 2
-						for k := j-1; k >= 1; k--{ //shift following tiles
-							board[i][k] = board[i][k-1]
-						}
-						board[i][0] = 0
+			for j := 3; j >= 1; j-- {
+				if board[i][j] == board[i][j-1] { //marge matching tiles
+					board[i][j] *= 2
+					for k := j-1; k >= 1; k--{ //shift following tiles
+						board[i][k] = board[i][k-1]
 					}
+					board[i][0] = 0
 				}
 			}
 		}
