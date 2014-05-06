@@ -111,20 +111,36 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 	switch move{
 	case "U":
 		for i := 0; i < 4; i++ {
+			//shift tiles
 			free := 4
-			for j := 0; j < 4; j++ {
+			for j := 0; j < 4; j++ { //find first empty tile
 				if board[j][i] == 0 {
 					free = j
 					break
 				}
 			}
-			for j := free+1; j < 4; j++ {
+			for j := free+1; j < 4; j++ { //move each non-empty tile to first empty tile
 				if board[j][i] == 0 {
 					continue
 				}
 				board[free][i] = board[j][i]
 				board[j][i] = 0
 				free++
+			}
+			//merge tiles
+			match := true
+			for p := 0; p < 2 && match; p++ { //if tiles were merged, make two passes
+				match = false
+				for j := 0; j < 3; j++ {
+					if board[j][i] == board[j+1][i] { //marge matching tiles
+						match = true
+						board[j][i] *= 2
+						for k := j+1; k < 3; k++{ //shift following tiles
+							board[k][i] = board[k+1][i]
+						}
+						board[3][i] = 0
+					}
+				}
 			}
 		}
 	}

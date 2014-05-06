@@ -34,25 +34,25 @@ func TestSimMove(t *testing.T) {
 	   0 0 0 4 */
 	var validBoard [4][4]uint16
 
-	validBoard[0][0] = 2
-	validBoard[0][1] = 2
-	validBoard[0][2] = 8
-	validBoard[0][3] = 4
+	validBoard[0][0] = 4
+	validBoard[0][1] = 4
+	validBoard[0][2] = 16
+	validBoard[0][3] = 16
 
-	validBoard[1][0] = 2
-	validBoard[1][1] = 2
-	validBoard[1][2] = 8
-	validBoard[1][3] = 4
+	validBoard[1][0] = 8
+	validBoard[1][1] = 0
+	validBoard[1][2] = 0
+	validBoard[1][3] = 0
 
-	validBoard[2][0] = 8
+	validBoard[2][0] = 0
 	validBoard[2][1] = 0
 	validBoard[2][2] = 0
-	validBoard[2][3] = 4
+	validBoard[2][3] = 0
 
 	validBoard[3][0] = 0
 	validBoard[3][1] = 0
 	validBoard[3][2] = 0
-	validBoard[3][3] = 4
+	validBoard[3][3] = 0
 
 	newBoard := simMove(board, "U")
 
