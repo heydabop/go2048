@@ -107,6 +107,30 @@ func findMove(board [4][4]uint16) string {
 	return "U"
 }
 
+func simMove(board [4][4]uint16, move string) [4][4]uint16 {
+	switch move{
+	case "U":
+		for i := 0; i < 4; i++ {
+			free := 4
+			for j := 0; j < 4; j++ {
+				if board[j][i] == 0 {
+					free = j
+					break
+				}
+			}
+			for j := free+1; j < 4; j++ {
+				if board[j][i] == 0 {
+					continue
+				}
+				board[free][i] = board[j][i]
+				board[j][i] = 0
+				free++
+			}
+		}
+	}
+	return board
+}
+
 func main() {
 	x11, err := xgbutil.NewConn() //connect to X
 	if err != nil {
@@ -153,11 +177,12 @@ OuterLoop: //search screen for upper left corner of board
 			}
 		}
 	}
+
 	tileX, tileY := boardX+20, boardY+20
 	for x := 0; x < 4; x++ {
 		for y := 0; y < 4; y++ {
 			board[x][y] = colorNum(img.At(tileX+(121*y), tileY+(121*x)))
-			fmt.Print(board[x][y])
+			fmt.Print(board[x][y], " ")
 		}
 		fmt.Println()
 	}
