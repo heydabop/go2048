@@ -60,6 +60,53 @@ func colorNum(c color.Color) uint16 {
 	return 0
 }
 
+func findMove(board [4][4]uint16) string {
+	rowMatches, colMatches := 0, 0
+
+	//find matches made by a move row-wise (left or right)
+	for i := 0; i < 4; i++ {
+		lastSeen := board[i][0]
+		for j := 1; j < 4; j++ {
+			if board[i][j] == 0 {
+				continue
+			}
+			if lastSeen == 0 {
+				lastSeen = board[i][j]
+				continue
+			}
+			if lastSeen == board[i][j] {
+				rowMatches++
+			}
+			lastSeen = board[i][j]
+		}
+	}
+
+	//find matches made by a move column-wise (up or down)
+	for i := 0; i < 4; i++ {
+		lastSeen := board[0][i]
+		for j := 1; j < 4; j++ {
+			if board[j][i] == 0 {
+				continue
+			}
+			if lastSeen == 0 {
+				lastSeen = board[j][i]
+				continue
+			}
+			if lastSeen == board[j][i] {
+				colMatches++
+			}
+			lastSeen = board[j][i]
+		}
+	}
+
+	fmt.Println(rowMatches)
+	fmt.Println(colMatches)
+	if rowMatches > colMatches {
+		return "L"
+	}
+	return "U"
+}
+
 func main() {
 	x11, err := xgbutil.NewConn() //connect to X
 	if err != nil {
@@ -114,4 +161,5 @@ OuterLoop: //search screen for upper left corner of board
 		}
 		fmt.Println()
 	}
+	fmt.Println(findMove(board))
 }
