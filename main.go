@@ -67,7 +67,7 @@ func exploreMoves(board [4][4]uint16, moves []byte, depth int) ([]byte, int) {
 		for i := 0; i < 4; i++ {
 			for j := 0; j < 4; j++ {
 				if board[i][j] != 0 {
-					score += int(board[i][j]) - 5
+					score += int(board[i][j]) - 7
 				}
 			}
 		}
@@ -312,11 +312,11 @@ ImgLoop:
 		if err != nil {
 			log.Fatal(err)
 		}
-		for x := 0; x < 4; x++ {
-			for y := 0; y < 4; y++ {
-				board[x][y], err = colorNum(img.At(tileX+(121*y), tileY+(121*x)))
+		for y := 0; y < 4; y++ {
+			for x := 0; x < 4; x++ {
+				board[y][x], err = colorNum(img.At(tileX+(121*x), tileY+(121*y)))
 				if err != nil {
-					fmt.Println(err, " at ", tileX+(121*y), tileY+(121*x))
+					fmt.Println(err, " at ", tileX+(121*x), tileY+(121*y)
 					time.Sleep(1 * time.Second)
 					continue ImgLoop
 				}
