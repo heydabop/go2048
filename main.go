@@ -316,7 +316,7 @@ ImgLoop:
 			for x := 0; x < 4; x++ {
 				board[y][x], err = colorNum(img.At(tileX+(121*x), tileY+(121*y)))
 				if err != nil {
-					fmt.Println(err, " at ", tileX+(121*x), tileY+(121*y)
+					fmt.Println(err, " at ", tileX+(121*x), tileY+(121*y))
 					time.Sleep(1 * time.Second)
 					continue ImgLoop
 				}
