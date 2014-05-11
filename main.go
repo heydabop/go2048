@@ -74,10 +74,31 @@ func exploreMoves(board [4][4]uint16, depth int) (string, int) {
 		}
 		return "", score
 	}
-	_, up := exploreMoves(simMove(board, "U"), depth-1)
-	_, down := exploreMoves(simMove(board, "D"), depth-1)
-	_, left := exploreMoves(simMove(board, "L"), depth-1)
-	_, right := exploreMoves(simMove(board, "R"), depth-1)
+	up, down, left, right := 0, 0, 0, 0
+	uboard := simMove(board, "U")
+	dboard := simMove(board, "D")
+	lboard := simMove(board, "L")
+	rboard := simMove(board, "R")
+	if uboard == board {
+		up = -100
+	} else {
+		_, up = exploreMoves(uboard, depth-1)
+	}
+	if dboard == board {
+		down = -100
+	} else {
+		_, down = exploreMoves(simMove(board, "D"), depth-1)
+	}
+	if lboard == board {
+		left = -100
+	} else {
+		_, left = exploreMoves(simMove(board, "L"), depth-1)
+	}
+	if rboard == board {
+		right = -100
+	} else {
+		_, right = exploreMoves(simMove(board, "R"), depth-1)
+	}
 	fmt.Println("Moves:", up, down, left, right)
 	if up >= down {
 		if up >= left {
@@ -155,7 +176,7 @@ func calcMatches(board [4][4]uint16) (string, int) {
 }
 
 func findMove(board [4][4]uint16) string {
-	move, _ := exploreMoves(board, 3)
+	move, _ := exploreMoves(board, 1)
 	//fmt.Println(calcMatches(board))
 	return move
 }
