@@ -61,7 +61,7 @@ func colorNum(c color.Color) uint16 {
 	return 0
 }
 
-func exploreMoves(board [4][4]uint16, depth int) (string, int) {
+func exploreMoves(board [4][4]uint16, moves []byte, depth int) ([]byte, int) {
 	if depth == 0 {
 		//return calcMatches(board)
 		score := 0
@@ -69,11 +69,13 @@ func exploreMoves(board [4][4]uint16, depth int) (string, int) {
 			for j := 0; j < 4; j++ {
 				if board[i][j] != 0{
 					score += int((math.Log2(float64(board[i][j])) - 2))
+					//score--
 				}
 			}
 		}
-		return "", score
+		return moves, score
 	}
+	var umoves, dmoves, lmoves, rmoves []byte
 	up, down, left, right := 0, 0, 0, 0
 	uboard := simMove(board, "U")
 	dboard := simMove(board, "D")
@@ -82,103 +84,57 @@ func exploreMoves(board [4][4]uint16, depth int) (string, int) {
 	if uboard == board {
 		up = -100
 	} else {
-		_, up = exploreMoves(uboard, depth-1)
+		umoves, up = exploreMoves(uboard, moves, depth-1)
 	}
 	if dboard == board {
 		down = -100
 	} else {
-		_, down = exploreMoves(simMove(board, "D"), depth-1)
+		dmoves, down = exploreMoves(dboard, moves, depth-1)
 	}
 	if lboard == board {
 		left = -100
 	} else {
-		_, left = exploreMoves(simMove(board, "L"), depth-1)
+		lmoves, left = exploreMoves(lboard, moves, depth-1)
 	}
 	if rboard == board {
 		right = -100
 	} else {
-		_, right = exploreMoves(simMove(board, "R"), depth-1)
+		rmoves, right = exploreMoves(rboard, moves, depth-1)
 	}
-	fmt.Println("Moves:", up, down, left, right)
+	fmt.Println("Moves:", up, down, left, right, " -- ", moves, depth)
 	if up >= down {
 		if up >= left {
 			if up >= right {
-				return "U", up
+				return append(umoves, 'U'), up
 			}
-			return "R", right
+			return append(rmoves, 'R'), right
 		}
 		if left >= right {
-			return "L", left
+			return append(lmoves, 'L'), left
 		}
-		return "R", right
+		return append(rmoves, 'R'), right
 	}
 	if down >= left {
 		if down >= right {
-			return "D", down
+			return append(dmoves, 'D'), down
 		}
-		return "R", right
+		return append(rmoves, 'R'), right
 	}
 	if left >= right {
-		return "L", left
+		return append(lmoves, 'L'), left
 	}
-	return "R", right
+	return append(rmoves, 'R'), right
 }
 
-func calcMatches(board [4][4]uint16) (string, int) {
-	rowMatches, colMatches := 0, 0
-
-	//find matches made by a move row-wise (left or right)
-	for i := 0; i < 4; i++ {
-		lastSeen := board[i][0]
-		for j := 1; j < 4; j++ {
-			if board[i][j] == 0 {
-				continue
-			}
-			if lastSeen == 0 {
-				lastSeen = board[i][j]
-				continue
-			}
-			if lastSeen == board[i][j] {
-				rowMatches++
-				lastSeen = 0
-			} else {
-				lastSeen = board[i][j]
-			}
-		}
-	}
-
-	//find matches made by a move column-wise (up or down)
-	for i := 0; i < 4; i++ {
-		lastSeen := board[0][i]
-		for j := 1; j < 4; j++ {
-			if board[j][i] == 0 {
-				continue
-			}
-			if lastSeen == 0 {
-				lastSeen = board[j][i]
-				continue
-			}
-			if lastSeen == board[j][i] {
-				colMatches++
-				lastSeen = 0
-			} else {
-				lastSeen = board[j][i]
-			}
-		}
-	}
-
-	//fmt.Println(rowMatches)
-	//fmt.Println(colMatches)
-	if rowMatches > colMatches {
-		return "L", rowMatches
-	}
-	return "U", colMatches
-}
-
-func findMove(board [4][4]uint16) string {
-	move, _ := exploreMoves(board, 1)
+func findMove(board [4][4]uint16) []byte {
+	depth := 3
+	moves := make([]byte, depth)
+	moves, _ = exploreMoves(board, moves, depth)
 	//fmt.Println(calcMatches(board))
-	return move
+	for i, j := 0, len(moves)-1; i < j; i, j = i+1, j-1 {
+		moves[i], moves[j] = moves[j], moves[i]
+	}
+	return moves
 }
 
 func simMove(board [4][4]uint16, move string) [4][4]uint16 {
