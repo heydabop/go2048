@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"image/color"
 	"log"
-	"math"
+	"time"
 
 	"github.com/BurntSushi/xgb/xproto"
 
@@ -28,37 +28,36 @@ var tile1024 = xgraphics.BGRA{63, 197, 237, 255}  //1024 tile
 var tile2048 = xgraphics.BGRA{46, 194, 237, 255}  //2048 tile
 var tile4096 = xgraphics.BGRA{50, 58, 60, 255}    //4096+ tile, i think 8192 and onward is also the same color
 
-func colorNum(c color.Color) uint16 {
+func colorNum(c color.Color) (uint16, error) {
 	switch c {
 	case tile0:
-		return 0
+		return 0, nil
 	case tile2:
-		return 2
+		return 2, nil
 	case tile4:
-		return 4
+		return 4, nil
 	case tile8:
-		return 8
+		return 8, nil
 	case tile16:
-		return 16
+		return 16, nil
 	case tile32:
-		return 32
+		return 32, nil
 	case tile64:
-		return 64
+		return 64, nil
 	case tile128:
-		return 128
+		return 128, nil
 	case tile256:
-		return 256
+		return 256, nil
 	case tile512:
-		return 512
+		return 512, nil
 	case tile1024:
-		return 1024
+		return 1024, nil
 	case tile2048:
-		return 2048
+		return 2048, nil
 	case tile4096:
-		return 4096
+		return 4096, nil
 	}
-	log.Panic("Unknown color!: ", c)
-	return 0
+	return 0, fmt.Errorf("Unrecognized color: %v", c)
 }
 
 func exploreMoves(board [4][4]uint16, moves []byte, depth int) ([]byte, int) {
@@ -67,9 +66,8 @@ func exploreMoves(board [4][4]uint16, moves []byte, depth int) ([]byte, int) {
 		score := 0
 		for i := 0; i < 4; i++ {
 			for j := 0; j < 4; j++ {
-				if board[i][j] != 0{
-					score += int((math.Log2(float64(board[i][j])) - 2))
-					//score--
+				if board[i][j] != 0 {
+					score += int(board[i][j]) - 5
 				}
 			}
 		}
@@ -127,7 +125,7 @@ func exploreMoves(board [4][4]uint16, moves []byte, depth int) ([]byte, int) {
 }
 
 func findMove(board [4][4]uint16) []byte {
-	depth := 3
+	depth := 2
 	moves := make([]byte, depth)
 	moves, _ = exploreMoves(board, moves, depth)
 	//fmt.Println(calcMatches(board))
@@ -138,7 +136,7 @@ func findMove(board [4][4]uint16) []byte {
 }
 
 func simMove(board [4][4]uint16, move string) [4][4]uint16 {
-	switch move{
+	switch move {
 	case "U":
 		for i := 0; i < 4; i++ {
 			//shift tiles
@@ -149,7 +147,7 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 					break
 				}
 			}
-			for j := free+1; j < 4; j++ { //move each non-empty tile to first empty tile
+			for j := free + 1; j < 4; j++ { //move each non-empty tile to first empty tile
 				if board[j][i] == 0 {
 					continue
 				}
@@ -161,7 +159,7 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 			for j := 0; j < 3; j++ {
 				if board[j][i] == board[j+1][i] { //marge matching tiles
 					board[j][i] *= 2
-					for k := j+1; k < 3; k++{ //shift following tiles
+					for k := j + 1; k < 3; k++ { //shift following tiles
 						board[k][i] = board[k+1][i]
 					}
 					board[3][i] = 0
@@ -178,7 +176,7 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 					break
 				}
 			}
-			for j := free-1; j >= 0; j-- { //move each non-empty tile to first empty tile
+			for j := free - 1; j >= 0; j-- { //move each non-empty tile to first empty tile
 				if board[j][i] == 0 {
 					continue
 				}
@@ -190,7 +188,7 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 			for j := 3; j >= 1; j-- {
 				if board[j][i] == board[j-1][i] { //marge matching tiles
 					board[j][i] *= 2
-					for k := j-1; k >= 1; k--{ //shift following tiles
+					for k := j - 1; k >= 1; k-- { //shift following tiles
 						board[k][i] = board[k-1][i]
 					}
 					board[0][i] = 0
@@ -207,7 +205,7 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 					break
 				}
 			}
-			for j := free+1; j < 4; j++ { //move each non-empty tile to first empty tile
+			for j := free + 1; j < 4; j++ { //move each non-empty tile to first empty tile
 				if board[i][j] == 0 {
 					continue
 				}
@@ -219,7 +217,7 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 			for j := 0; j < 3; j++ {
 				if board[i][j] == board[i][j+1] { //marge matching tiles
 					board[i][j] *= 2
-					for k := j+1; k < 3; k++{ //shift following tiles
+					for k := j + 1; k < 3; k++ { //shift following tiles
 						board[i][k] = board[i][k+1]
 					}
 					board[i][3] = 0
@@ -236,7 +234,7 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 					break
 				}
 			}
-			for j := free-1; j >= 0; j-- { //move each non-empty tile to first empty tile
+			for j := free - 1; j >= 0; j-- { //move each non-empty tile to first empty tile
 				if board[i][j] == 0 {
 					continue
 				}
@@ -248,7 +246,7 @@ func simMove(board [4][4]uint16, move string) [4][4]uint16 {
 			for j := 3; j >= 1; j-- {
 				if board[i][j] == board[i][j-1] { //marge matching tiles
 					board[i][j] *= 2
-					for k := j-1; k >= 1; k--{ //shift following tiles
+					for k := j - 1; k >= 1; k-- { //shift following tiles
 						board[i][k] = board[i][k-1]
 					}
 					board[i][0] = 0
@@ -306,13 +304,30 @@ OuterLoop: //search screen for upper left corner of board
 		}
 	}
 
-	tileX, tileY := boardX+20, boardY+20
-	for x := 0; x < 4; x++ {
-		for y := 0; y < 4; y++ {
-			board[x][y] = colorNum(img.At(tileX+(121*y), tileY+(121*x)))
-			fmt.Print(board[x][y], " ")
+	tileX, tileY := boardX+63, boardY+39
+	lastBoard := board
+ImgLoop:
+	for i := 0; true; i++ {
+		img, err := xgraphics.NewDrawable(x11, xproto.Drawable(x11.RootWin())) //get screen
+		if err != nil {
+			log.Fatal(err)
 		}
-		fmt.Println()
+		for x := 0; x < 4; x++ {
+			for y := 0; y < 4; y++ {
+				board[x][y], err = colorNum(img.At(tileX+(121*y), tileY+(121*x)))
+				if err != nil {
+					fmt.Println(err, " at ", tileX+(121*y), tileY+(121*x))
+					time.Sleep(1 * time.Second)
+					continue ImgLoop
+				}
+				//fmt.Print(board[x][y], " ")
+			}
+			//fmt.Println()
+		}
+		if lastBoard != board {
+			fmt.Println(string(findMove(board)), i)
+		}
+		lastBoard = board
+		time.Sleep(1 * time.Second)
 	}
-	fmt.Println(findMove(board))
 }
