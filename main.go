@@ -84,12 +84,17 @@ func exploreMoves(board [4][4]uint16, moves []byte, depth int) ([]byte, int) {
 	if depth == 0 {
 		//return calcMatches(board)
 		score := 0
+		tiles := 0
 		for i := 0; i < 4; i++ {
 			for j := 0; j < 4; j++ {
 				if board[i][j] != 0 {
 					score += int(board[i][j]) - 7
+					tiles++
 				}
 			}
+		}
+		if tiles >= 15 {
+			score -= 128
 		}
 		return moves, score
 	}
