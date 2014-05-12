@@ -60,6 +60,26 @@ func colorNum(c color.Color) (uint16, error) {
 	return 0, fmt.Errorf("Unrecognized color: %v", c)
 }
 
+func endGame(board [4][4]uint16) bool {
+	uboard := simMove(board, "U")
+	if uboard != board {
+		return false
+	}
+	dboard := simMove(board, "D")
+	if dboard != board {
+		return false
+	}
+	lboard := simMove(board, "L")
+	if lboard != board {
+		return false
+	}
+	rboard := simMove(board, "R")
+	if rboard != board {
+		return false
+	}
+	return true
+}
+
 func exploreMoves(board [4][4]uint16, moves []byte, depth int) ([]byte, int) {
 	if depth == 0 {
 		//return calcMatches(board)
@@ -81,25 +101,37 @@ func exploreMoves(board [4][4]uint16, moves []byte, depth int) ([]byte, int) {
 	rboard := simMove(board, "R")
 	if uboard == board {
 		up = -100
+		if endGame(board) {
+			return nil, -1000
+		}
 	} else {
 		umoves, up = exploreMoves(uboard, moves, depth-1)
 	}
 	if dboard == board {
 		down = -100
+		if endGame(board) {
+			return nil, -1000
+		}
 	} else {
 		dmoves, down = exploreMoves(dboard, moves, depth-1)
 	}
 	if lboard == board {
 		left = -100
+		if endGame(board) {
+			return nil, -1000
+		}
 	} else {
 		lmoves, left = exploreMoves(lboard, moves, depth-1)
 	}
 	if rboard == board {
 		right = -100
+		if endGame(board) {
+			return nil, -1000
+		}
 	} else {
 		rmoves, right = exploreMoves(rboard, moves, depth-1)
 	}
-	fmt.Println("Moves:", up, down, left, right, " -- ", moves, depth)
+	//fmt.Println("Moves:", up, down, left, right, " -- ", moves, depth)
 	if up >= down {
 		if up >= left {
 			if up >= right {
